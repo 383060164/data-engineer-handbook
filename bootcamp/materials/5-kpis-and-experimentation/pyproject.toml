@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "5-kpis-and-experimentation"
+version = "0.1.0"
+description = ""
+authors = ["Tianyang Gao"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+flask = "^3.1.0"
+requests = "^2.32.3"
+jsonify = "^0.5"
+statsig = "^0.53.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
