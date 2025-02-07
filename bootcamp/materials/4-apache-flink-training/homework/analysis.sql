@@ -1,24 +1,41 @@
--- Average events per session for Tech Creator hosts
+-- Calculate average events per session for each host
+WITH host_stats AS (
+    SELECT
+        host,
+        COUNT(*) as total_sessions,
+        AVG(event_count) as avg_events_per_session,
+        STDDEV(event_count) as stddev_events,
+        MIN(event_count) as min_events,
+        MAX(event_count) as max_events
+    FROM web_sessions
+    GROUP BY host
+)
 SELECT
     host,
-    AVG(event_count) as avg_events_per_session,
-    COUNT(*) as total_sessions
-FROM web_sessions
-WHERE host LIKE '%techcreator.io'
-GROUP BY host
+    total_sessions,
+    ROUND(avg_events_per_session, 2) as avg_events,
+    ROUND(stddev_events, 2) as stddev_events,
+    min_events,
+    max_events
+FROM host_stats
+WHERE host IN (
+    'zachwilson.techcreator.io',
+    'zachwilson.tech',
+    'lulu.techcreator.io'
+)
 ORDER BY avg_events_per_session DESC;
 
--- Compare specific hosts
+-- Compare session patterns across different times of day
 SELECT
     host,
-    AVG(event_count) as avg_events_per_session,
-    COUNT(*) as total_sessions,
-    AVG(EXTRACT(EPOCH FROM (session_end - session_start))) as avg_session_duration_seconds
+    EXTRACT(HOUR FROM session_start) as hour_of_day,
+    COUNT(*) as session_count,
+    ROUND(AVG(event_count), 2) as avg_events
 FROM web_sessions
 WHERE host IN (
     'zachwilson.techcreator.io',
     'zachwilson.tech',
     'lulu.techcreator.io'
 )
-GROUP BY host
-ORDER BY avg_events_per_session DESC;
+GROUP BY host, EXTRACT(HOUR FROM session_start)
+ORDER BY host, hour_of_day;
